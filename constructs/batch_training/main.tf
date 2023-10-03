@@ -140,7 +140,7 @@ data "aws_availability_zones" "available" {
 }
 
 module "vpc" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-vpc?ref=master"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-vpc?ref=master"
 
   name = "${var.name_prefix}-${local.context}-vpc"
   cidr = local.cidr
@@ -156,7 +156,7 @@ module "vpc" {
 }
 
 module "vpc_endpoints" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-vpc/modules/vpc-endpoints?ref=master"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-vpc/modules/vpc-endpoints?ref=master"
 
   vpc_id             = module.vpc.vpc_id
   security_group_ids = [module.vpc_endpoint_security_group.security_group_id]
