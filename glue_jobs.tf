@@ -145,7 +145,7 @@ resource "aws_s3_object" "upload_ext_scripts" {
 /* -------------------------------------------------------------------------- */
 
 module "glue_jobs" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-glue-job?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-glue-job?ref=master"
 
   for_each = local.glue_jobs
 

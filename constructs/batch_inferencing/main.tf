@@ -59,7 +59,7 @@ module "inferencing_contruct" {
 ################################################################################
 
 module "vpc_endpoint_security_group" {
-  source = "git::github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-security-group"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-security-group"
 
   name        = "${var.name_prefix}-${local.context}-vep-sg"
   description = "Security group for VPC endpoints"

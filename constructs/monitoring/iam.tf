@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "glue_job_policy" {
 }
 
 module "glue_job_policy" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-policy?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//iam-policy?ref=master"
 
   create_policy = true
   name          = "${var.name_prefix}-dapf-${local.context}-glue-job-policy"
@@ -23,7 +23,7 @@ module "glue_job_policy" {
 }
 
 module "glue_job_role" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-role?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//iam-role?ref=master"
 
   create_role           = true
   role_name             = "${var.name_prefix}-dapf-${local.context}-glue-job-role"

@@ -140,7 +140,7 @@ data "aws_availability_zones" "available" {
 }
 
 module "vpc" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-vpc?ref=v1.0.0"
+  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-vpc?ref=master"
 
   name = "${var.name_prefix}-${local.context}-vpc"
   cidr = local.cidr
@@ -156,7 +156,7 @@ module "vpc" {
 }
 
 module "vpc_endpoints" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-vpc/modules/vpc-endpoints?ref=v1.0.0"
+  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-vpc/modules/vpc-endpoints?ref=master"
 
   vpc_id             = module.vpc.vpc_id
   security_group_ids = [module.vpc_endpoint_security_group.security_group_id]
@@ -170,7 +170,7 @@ module "vpc_endpoints" {
 
 
 module "vpc_endpoint_security_group" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-security-group?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-security-group?ref=master"
 
   name        = "${var.name_prefix}-${local.context}-vep-sg"
   description = "Security group for VPC endpoints"
@@ -226,7 +226,7 @@ resource "aws_cloudwatch_event_rule" "sm_registry_event" {
 }
 
 module "lambda" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-lambda?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-lambda?ref=master"
 
   function_name = "${var.name_prefix}-sm-model-approval-event-processor"
   description   = "Lambda function to consume sagemaker registry approval and update ssm parameter"

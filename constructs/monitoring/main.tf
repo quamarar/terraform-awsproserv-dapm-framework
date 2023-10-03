@@ -93,7 +93,7 @@ resource "aws_s3_object" "upload_ext_scripts" {
 /* -------------------------------------------------------------------------- */
 
 module "glue_jobs" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-glue-job?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-glue-job?ref=master"
 
   for_each = local.glue_jobs
 
@@ -121,7 +121,7 @@ module "glue_jobs" {
 }
 
 module "lambda" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-lambda?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-lambda?ref=master"
 
   function_name = "${var.name_prefix}-glue-trigger-on-event"
   description   = "Lambda function to trigger other lambda functions"

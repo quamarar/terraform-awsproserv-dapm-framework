@@ -101,7 +101,7 @@ locals {
 /* ------------------------------------------------------------------------------------ */
 
 module "step_function" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-step-functions?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-step-functions?ref=master"
 
   name = "${var.name_prefix}-modelops-${local.context}-orchestrator"
   type = "standard"
@@ -165,7 +165,7 @@ resource "aws_ssm_parameter" "ssm_params" {
 }
 
 module "ddb_tables" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-dynamodb-table?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-dynamodb-table?ref=master"
 
   for_each = local.ddb_params
 
@@ -183,7 +183,7 @@ module "ddb_tables" {
 }
 
 module "ecr_repositories" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-ecr?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-ecr?ref=master"
 
   for_each = toset([local.context, "preprocessing"])
 
@@ -201,7 +201,7 @@ module "ecr_repositories" {
 ===============================*/
 
 module "s3_buckets" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-s3-bucket?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-s3-bucket?ref=master"
 
   for_each = local.s3_configs
 

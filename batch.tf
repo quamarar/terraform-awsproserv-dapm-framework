@@ -24,7 +24,7 @@ resource "aws_cloudwatch_log_group" "batch" {
 }
 
 module "batch" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//terraform-aws-batch?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//terraform-aws-batch?ref=master"
 
   instance_iam_role_name        = "${var.name_prefix}-dapf-${local.context}"
   instance_iam_role_path        = "/batch/"
