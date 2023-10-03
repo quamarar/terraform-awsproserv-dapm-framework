@@ -1,4 +1,3 @@
-
 # Batch Training Module
 
 Resources created

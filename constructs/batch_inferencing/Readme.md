@@ -1,5 +1,4 @@
-
-# Batch Training Module
+# Batch inferencing module
 
 Resources created
 

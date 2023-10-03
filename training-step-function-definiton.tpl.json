@@ -1,0 +1,298 @@
+{
+    "Comment": "An example Step Functions state machine to run and check Glue job status",
+    "StartAt": "SSM (Get ${context} batch definition version)",
+    "States": {
+        "SSM (Get ${context} batch definition version)": {
+            "Type": "Task",
+            "Next": "Glue python (data gatekeeper).sync",
+            "Parameters": {
+                "Name": "${ssm_param_batch_job_definition}"
+            },
+            "Resource": "arn:aws:states:::aws-sdk:ssm:getParameter",
+            "ResultPath": "$.batch_job_definition_arn"
+        },
+        "Glue python (data gatekeeper).sync": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${glue_gatekeeper_job_name}",
+                "Arguments": {
+                    "--execution_id.$": "$$.Execution.Id",
+                    "--use_case_name.$": "$.use_case_name",
+                    "--athena_pred_or_eval_table_name.$": "$.athena_pred_or_eval_table_name",
+                    "--athenadb_name.$": "$.athenadb_name",
+                    "--athenadb_debug_table_name.$": "$.athenadb_debug_table_name",
+                    "--athenadb_evaluation_summary_table_name.$": "$.athenadb_evaluation_summary_table_name",
+                    "--train_statetable_name.$": "$.train_statetable_name",
+                    "--train_inputtable_name.$": "$.train_inputtable_name",
+                    "--train_metatable_name.$": "$.train_metatable_name",
+                    "--s3_bucket_name_analytics_etl.$": "$.s3_bucket_name_analytics_etl",
+                    "--s3_bucket_name_internal.$": "$.s3_bucket_name_internal",
+                    "--s3_bucket_name_shared.$": "$.s3_bucket_name_shared",
+                    "--mapping_json_S3_path.$": "$.mapping_json_S3_path",
+                    "--aws_batch_job_definition_arn.$": "$.batch_job_definition_arn.Parameter.Value",
+                    "--region.$": "$.region",
+                    "--year.$": "$.year",
+                    "--month.$": "$.month",
+                    "--day.$": "$.day",
+                    "--aws_batch_job_queue.$": "$.aws_batch_job_queue",
+                    "--aws_batch_job_name.$": "$.aws_batch_job_name",
+                    "--athenadb_metadata_table_name.$": "$.athenadb_metadata_table_name",
+                    "--ssm_${context}_complete_status.$": "$.ssm_${context}_complete_status",
+                    "--ssm_${context}_sagemaker_preprocesing_ecr_url": "${ssm_param_preprocessing_image}",
+                    "--ssm_${context}_aws_batch_ecr_url": "${ssm_param_aws_batch_ecr_url}",
+                    "--dq_athena_db.$": "$.dq_athena_db",
+                    "--dq_table.$": "$.dq_table",
+                    "--email_topic_arn.$": "$.sns_topic_arn",
+                    "--${context}_event_bus_name.$": "$.${context}_event_bus_name",
+                    "--repository.$": "$.repository",
+                    "--model_package_group_name.$": "$.model_package_group_name"
+                }
+            },
+            "Next": "SSM (Get Preprocessing ECR image)",
+            "ResultPath": "$.jobRun",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "Comment": "Failed state handling",
+                    "Next": "Glue Python (Cleanup).sync"
+                }
+            ],
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.Timeout"
+                    ],
+                    "BackoffRate": 2,
+                    "MaxAttempts": 2,
+                    "Comment": "Time out retry",
+                    "IntervalSeconds": 30
+                }
+            ]
+        },
+        "SSM (Get Preprocessing ECR image)": {
+            "Type": "Task",
+            "Next": "SageMaker Processing (Preprocessing).sync",
+            "Parameters": {
+                "Name": "${ssm_param_preprocessing_image}"
+            },
+            "Resource": "arn:aws:states:::aws-sdk:ssm:getParameter",
+            "ResultPath": "$.preprocessing_url",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "Comment": "failed state handling",
+                    "Next": "Glue Python (Cleanup).sync"
+                }
+            ]
+        },
+        "SageMaker Processing (Preprocessing).sync": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::sagemaker:createProcessingJob.sync",
+            "Parameters": {
+                "ProcessingJobName.$": "$$.Execution.Name",
+                "AppSpecification": {
+                    "ImageUri.$": "$.preprocessing_url.Parameter.Value",
+                    "ContainerArguments.$": "States.StringSplit(States.Format('--train_metatable_name,{},--region,{}',$.jobRun.Arguments['--train_metatable_name'],$.jobRun.Arguments['--region']),',')"
+                },
+                "ProcessingResources": {
+                    "ClusterConfig": {
+                        "InstanceCount": 1,
+                        "InstanceType": "ml.c5.2xlarge",
+                        "VolumeSizeInGB": 10
+                    }
+                },
+                "RoleArn": "${sagemaker_processing_job_execution_role_arn}"
+            },
+            "Next": "Glue python (Submit AWS Batch for ${context}).sync",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "Comment": "Failed stated handling",
+                    "Next": "Glue Python (Cleanup).sync"
+                }
+            ],
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.Timeout"
+                    ],
+                    "BackoffRate": 2,
+                    "MaxAttempts": 2,
+                    "Comment": "timeout retry",
+                    "IntervalSeconds": 30
+                }
+            ]
+        },
+        "Glue python (Submit AWS Batch for ${context}).sync": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${glue_submit_job_name}"
+            },
+            "Next": "Wait",
+            "ResultPath": "$.jobRun",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "Comment": "failed state handling",
+                    "Next": "Glue Python (Cleanup).sync"
+                }
+            ],
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.Timeout"
+                    ],
+                    "BackoffRate": 2,
+                    "MaxAttempts": 2,
+                    "Comment": "timeout retry",
+                    "IntervalSeconds": 30
+                }
+            ]
+        },
+        "Glue python (AWS Batch: Completion Status Check).sync": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${glue_batch_status_check_job_name}"
+            },
+            "Next": "SSM (${context}_complete_status)",
+            "ResultPath": "$.jobRun",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "Comment": "failed state handling",
+                    "Next": "Glue Python (Cleanup).sync"
+                }
+            ],
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.Timeout"
+                    ],
+                    "BackoffRate": 2,
+                    "MaxAttempts": 2,
+                    "Comment": "timeout retry",
+                    "IntervalSeconds": 30
+                }
+            ]
+        },
+        "SSM (${context}_complete_status)": {
+            "Type": "Task",
+            "Next": "Choice (Is ${context} complete?)",
+            "Parameters": {
+                "Name": "${ssm_param_complete_status}"
+            },
+            "Resource": "arn:aws:states:::aws-sdk:ssm:getParameter",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "Comment": "failed state handling",
+                    "Next": "Glue Python (Cleanup).sync"
+                }
+            ]
+        },
+        "Choice (Is ${context} complete?)": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.Parameter.Value",
+                    "StringEquals": "True",
+                    "Next": "Glue Python (Evalution).sync"
+                },
+                {
+                    "Variable": "$.Parameter.Value",
+                    "StringEquals": "False",
+                    "Next": "Wait"
+                }
+            ],
+            "Default": "Glue Python (Evalution).sync"
+        },
+        "Glue Python (Evalution).sync": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${glue_evaluation_job_name}"
+            },
+            "Next": "Glue Python (Cleanup).sync",
+            "ResultPath": "$.jobRun",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "Comment": "failed state handling",
+                    "Next": "Glue Python (Cleanup).sync"
+                }
+            ],
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.Timeout"
+                    ],
+                    "BackoffRate": 2,
+                    "MaxAttempts": 2,
+                    "Comment": "timeout retry",
+                    "IntervalSeconds": 30
+                }
+            ]
+        },
+        "Glue Python (Cleanup).sync": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${glue_cleanup_job_name}"
+            },
+            "ResultPath": "$.cleanupJobRun",
+            "Next": "Choice (Is SFN Successful?)",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ]
+        },
+        "Choice (Is SFN Successful?)": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.cleanupJobRun.JobRunState",
+                    "StringEquals": "SUCCEEDED",
+                    "Next": "Success"
+                },
+                {
+                    "Variable": "$.jobRun.JobRunState",
+                    "StringEquals": "SUCCEEDED",
+                    "Next": "Success"
+                }
+            ],
+            "Default": "Fail"
+        },
+        "Success": {
+            "Type": "Succeed"
+        },
+        "Fail": {
+            "Type": "Fail"
+        },
+        "Wait": {
+            "Type": "Wait",
+            "Seconds": 30,
+            "Next": "Glue python (AWS Batch: Completion Status Check).sync"
+        }
+    }
+}
