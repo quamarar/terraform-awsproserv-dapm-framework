@@ -2,7 +2,7 @@
 
 /* -------------------------- Glue Job permissions -------------------------- */
 module "batch_executioner_role" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-role?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//iam-role?ref=master"
 
   create_role           = true
   role_name             = "${var.name_prefix}-dapf-${local.context}-executioner"
@@ -287,7 +287,7 @@ EOF
 
 
 module "sagemaker_proprocessing_role" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-role?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//iam-role?ref=master"
 
   count = var.sagemaker_processing_job_execution_role_arn != null ? 0 : 1
 
