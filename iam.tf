@@ -12,7 +12,7 @@ module "batch_executioner_role" {
   max_session_duration  = 3600
   custom_role_policy_arns = [
     "arn:aws:iam::aws:policy/SecretsManagerReadWrite",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
   ]
 }
 
