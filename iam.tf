@@ -137,7 +137,7 @@ module "glue_custom_iam_policy" {
                 "states:ListTagsForResource"
             ],
             "Resource": [
-                "arn:aws:iam::{var.account_number}:role/*",
+                "arn:aws:iam::${var.account_number}:role/*",
                 "arn:aws:states:*:*:stateMachine:sagemaker-*",
                 "arn:aws:states:*:*:execution:sagemaker-*:*",
                 "arn:aws:sagemaker:ap-south-1:${var.account_number}:model-package/*",
