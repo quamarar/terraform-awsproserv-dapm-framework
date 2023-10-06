@@ -11,6 +11,12 @@ variable "context" {
 variable "use_case_name" {
   type        = string
   description = "Name of the use case. Identifier"
+  default = 731580992380
+}
+
+variable "use_case_name" {
+  type        = string
+  description = "Name of the use case. Identifier"
 }
 
 variable "name_prefix" {
