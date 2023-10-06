@@ -135,9 +135,24 @@ module "step_function" {
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "VisualEditor0",
             "Effect": "Allow",
-            "Action": "*",
-            "Resource": "*"
+            "Action": [
+                "iam:PassRole",
+                "glue:StartJobRun",
+                "glue:GetJobRun",
+                "glue:BatchStopJobRun",
+                "sagemaker:AddTags",
+                "sagemaker:CreateProcessingJob",
+                "ssm:GetParameter",
+                "glue:GetJobRuns"
+            ],
+            "Resource": [
+                "arn:aws:iam::{var.account_number}:role/*",
+                "arn:aws:glue:ap-south-1:{var.account_number}:job/*",
+                "arn:aws:sagemaker:ap-south-1:{var.account_number}:processing-job/*",
+                "arn:aws:ssm:ap-south-1:{var.account_number}:parameter/*"
+            ]
         }
     ]
 }
