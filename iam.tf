@@ -19,7 +19,7 @@ module "batch_executioner_role" {
 /* ----------------------- Glue permissions ---------------------- */
 
 module "glue_custom_iam_policy" {
-  source = "github.com/quamarar/terraform-common-modules//iam-policy"
+  source = "github.com/quamarar/terraform-common-modules//iam-policy?ref=master""
 
   name   = "${var.name_prefix}-dapf-${local.context}-glue-job-policy"
   path   = "/"
