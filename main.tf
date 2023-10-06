@@ -148,10 +148,10 @@ module "step_function" {
                 "glue:GetJobRuns"
             ],
             "Resource": [
-                "arn:aws:iam::{var.account_number}:role/*",
-                "arn:aws:glue:ap-south-1:{var.account_number}:job/*",
-                "arn:aws:sagemaker:ap-south-1:{var.account_number}:processing-job/*",
-                "arn:aws:ssm:ap-south-1:{var.account_number}:parameter/*"
+                "arn:aws:iam::${var.account_number}:role/*",
+                "arn:aws:glue:ap-south-1:${var.account_number}:job/*",
+                "arn:aws:sagemaker:ap-south-1:$var.account_number}:processing-job/*",
+                "arn:aws:ssm:ap-south-1:${var.account_number}:parameter/*"
             ]
         }
     ]
