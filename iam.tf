@@ -210,7 +210,7 @@ module "glue_job_role" {
 /* ----------------------- Sagemaker Preprocessing permissions ---------------------- */
 
 module "sagemaker_proprocessing_iam_policy" {
-  source = "git::https://github.com/quamarar/terraform-common-modules//iam-policy?ref=master"
+  source = "git::https://github.com/quamarar/terraform-common-modules//iam-policy?ref=master
 
   count = var.sagemaker_processing_job_execution_role_arn != null ? 0 : 1
 
