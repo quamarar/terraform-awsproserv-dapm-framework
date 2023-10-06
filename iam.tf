@@ -19,7 +19,7 @@ module "batch_executioner_role" {
 /* ----------------------- Glue permissions ---------------------- */
 
 module "glue_custom_iam_policy" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-policy"
+  source = ""git::https://github.com/quamarar/terraform-common-modules//iam-policy?ref=master"
 
   name   = "${var.name_prefix}-dapf-${local.context}-glue-job-policy"
   path   = "/"
@@ -193,7 +193,7 @@ EOF
 
 
 module "glue_job_role" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-role?ref=v1.0.0"
+  source = "git::https://github.com/quamarar/terraform-common-modules//iam-role?ref=master"
 
   create_role           = true
   role_name             = "${var.name_prefix}-dapf-${local.context}-glue-job-role"
@@ -210,7 +210,7 @@ module "glue_job_role" {
 /* ----------------------- Sagemaker Preprocessing permissions ---------------------- */
 
 module "sagemaker_proprocessing_iam_policy" {
-  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-policy"
+  source = "git::https://github.com/quamarar/terraform-common-modules//iam-policy?ref=master"
 
   count = var.sagemaker_processing_job_execution_role_arn != null ? 0 : 1
 
