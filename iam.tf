@@ -2,7 +2,7 @@
 
 /* -------------------------- Glue Job permissions -------------------------- */
 module "batch_executioner_role" {
-  source = "git::https://github.com/quamarar/terraform-common-modules//iam-role?ref=master"
+  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-role?ref=v1.0.0"
 
   create_role           = true
   role_name             = "${var.name_prefix}-dapf-${local.context}-executioner"
@@ -19,7 +19,7 @@ module "batch_executioner_role" {
 /* ----------------------- Glue permissions ---------------------- */
 
 module "glue_custom_iam_policy" {
-  source = "git::https://github.com/quamarar/terraform-common-modules//iam-policy?ref=master""
+  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-policy"
 
   name   = "${var.name_prefix}-dapf-${local.context}-glue-job-policy"
   path   = "/"
@@ -137,24 +137,24 @@ module "glue_custom_iam_policy" {
                 "states:ListTagsForResource"
             ],
             "Resource": [
-                "arn:aws:iam::${var.account_number}:role/*",
+                "arn:aws:iam::{var.account_number}:role/*",
                 "arn:aws:states:*:*:stateMachine:sagemaker-*",
                 "arn:aws:states:*:*:execution:sagemaker-*:*",
-                "arn:aws:sagemaker:ap-south-1:${var.account_number}:model-package/*",
-                "arn:aws:dynamodb:ap-south-1:${var.account_number}:table/*",
+                "arn:aws:sagemaker:ap-south-1:{var.account_number}:model-package/*",
+                "arn:aws:dynamodb:ap-south-1:{var.account_number}:table/*",
                 "arn:aws:lambda:*:*:function:sagemaker-*",
-                "arn:aws:events:ap-south-1:${var.account_number}:event-bus/*",
+                "arn:aws:events:ap-south-1:{var.account_number}:event-bus/*",
                 "arn:aws:events:*:*:rule/*/*",
                 "arn:aws:codestar-connections:*:*:connection/*",
-                "arn:aws:ecr:ap-south-1:${var.account_number}:repository/*",
-                "arn:aws:batch:ap-south-1:${var.account_number}:job-definition/*",
-                "arn:aws:batch:ap-south-1:${var.account_number}:job-queue/*",
+                "arn:aws:ecr:ap-south-1:{var.account_number}:repository/*",
+                "arn:aws:batch:ap-south-1:{var.account_number}:job-definition/*",
+                "arn:aws:batch:ap-south-1:{var.account_number}:job-queue/*",
                 "arn:aws:glue:*:*:table/*/*",
                 "arn:aws:glue:*:*:database/default",
                 "arn:aws:glue:*:*:database/global_temp",
                 "arn:aws:glue:*:*:database/sagemaker-*",
                 "arn:aws:glue:*:*:catalog",
-                "arn:aws:sns:ap-south-1:${var.account_number}:*",
+                "arn:aws:sns:ap-south-1:{var.account_number}:*",
                 "arn:aws:s3:::*",
                 "arn:aws:s3:::aws-athena-query-results-*"
             ]
@@ -165,19 +165,19 @@ module "glue_custom_iam_policy" {
             "Action": "athena:*",
             "Resource": [
                 "arn:aws:codestar-connections:*:*:connection/*",
-                "arn:aws:events:ap-south-1:${var.account_number}:event-bus/*",
+                "arn:aws:events:ap-south-1:{var.account_number}:event-bus/*",
                 "arn:aws:events:*:*:rule/*/*",
-                "arn:aws:sns:ap-south-1:${var.account_number}:*",
-                "arn:aws:ecr:ap-south-1:${var.account_number}:repository/*",
+                "arn:aws:sns:ap-south-1:{var.account_number}:*",
+                "arn:aws:ecr:ap-south-1:{var.account_number}:repository/*",
                 "arn:aws:s3:::*",
                 "arn:aws:s3:::aws-athena-query-results-*",
-                "arn:aws:batch:ap-south-1:${var.account_number}:job-definition/*",
-                "arn:aws:batch:ap-south-1:${var.account_number}:job-queue/*",
-                "arn:aws:iam::${var.account_number}:role/*",
-                "arn:aws:sagemaker:ap-south-1:${var.account_number}:model-package/*",
+                "arn:aws:batch:ap-south-1:{var.account_number}:job-definition/*",
+                "arn:aws:batch:ap-south-1:{var.account_number}:job-queue/*",
+                "arn:aws:iam::{var.account_number}:role/*",
+                "arn:aws:sagemaker:ap-south-1:{var.account_number}:model-package/*",
                 "arn:aws:states:*:*:stateMachine:sagemaker-*",
                 "arn:aws:states:*:*:execution:sagemaker-*:*",
-                "arn:aws:dynamodb:ap-south-1:${var.account_number}:table/*",
+                "arn:aws:dynamodb:ap-south-1:{var.account_number}:table/*",
                 "arn:aws:lambda:*:*:function:sagemaker-*",
                 "arn:aws:glue:*:*:table/*/*",
                 "arn:aws:glue:*:*:database/default",
@@ -193,7 +193,7 @@ EOF
 
 
 module "glue_job_role" {
-  source = "git::https://github.com/quamarar/terraform-common-modules//iam-role?ref=master"
+  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-role?ref=v1.0.0"
 
   create_role           = true
   role_name             = "${var.name_prefix}-dapf-${local.context}-glue-job-role"
@@ -210,7 +210,7 @@ module "glue_job_role" {
 /* ----------------------- Sagemaker Preprocessing permissions ---------------------- */
 
 module "sagemaker_proprocessing_iam_policy" {
-  source = "git::https://github.com/quamarar/terraform-common-modules//iam-policy?ref=master
+  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-policy"
 
   count = var.sagemaker_processing_job_execution_role_arn != null ? 0 : 1
 
@@ -248,11 +248,11 @@ module "sagemaker_proprocessing_iam_policy" {
                 "s3:GetObjectVersion"
             ],
             "Resource": [
-                "arn:aws:ecr:ap-south-1:${var.account_number}:repository/*",
-                "arn:aws:ecr-public::${var.account_number}:registry/*",
-                "arn:aws:ecr-public::${var.account_number}:repository/*",
+                "arn:aws:ecr:ap-south-1:{var.account_number}:repository/*",
+                "arn:aws:ecr-public::{var.account_number}:registry/*",
+                "arn:aws:ecr-public::{var.account_number}:repository/*",
                 "arn:aws:s3:::*/*",
-                "arn:aws:dynamodb:ap-south-1:${var.account_number}:table/*"
+                "arn:aws:dynamodb:ap-south-1:{var.account_number}:table/*"
             ]
         },
         {
@@ -287,7 +287,7 @@ EOF
 
 
 module "sagemaker_proprocessing_role" {
-  source = "git::https://github.com/quamarar/terraform-common-modules//iam-role?ref=master"
+  source = "github.com/MSIL-Analytics-ACE/terraform-common-modules//iam-role?ref=v1.0.0"
 
   count = var.sagemaker_processing_job_execution_role_arn != null ? 0 : 1
 
